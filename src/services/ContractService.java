@@ -16,9 +16,21 @@ public class ContractService {
 	//metodo 
 	public void processContract(Contract contract, int months) {
 		
-		contract.getInstallment().add(new Installment(LocalDate.of(2018, 7, 25), 206.04));
-		contract.getInstallment().add(new Installment(LocalDate.of(2018, 8, 25), 208.08));
+		double basicQuota = contract.getTotalValue() / months; // 600/3 = 200
 		
+		for (int i = 1; i <= months; i++) {
+			LocalDate dueDate = contract.getDate().plusMonths(i); //data original mais quantidade de meses "i"
+		
+			double interest = onlinePaymentService.interest(basicQuota, i); // calcula o juros de cada mes
+			double fee = onlinePaymentService.paymentFee(basicQuota + interest); //taxa
+			double quota = basicQuota + interest + fee;
+			
+			//instanciando e armazenando contrato dentro da minha ArrayList
+			contract.getInstallment().add(new Installment(dueDate, quota));
+		}
+		
+		
+		         
 	}
 	
 }
